@@ -7,6 +7,8 @@ router.post("/register", userController.register);
 router.post("/login", userController.login);
 router.get("/userprofile",authenticateToken ,userController.getUser);
 router.put('/updateprofile', authenticateToken, userController.updateProfile);
+router.post('/refresh-token', userController.refreshToken);
+
 
 
 module.exports = router;

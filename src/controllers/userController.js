@@ -3,6 +3,23 @@ const bcrypt = require("bcrypt");
 const UserModel = require("../models/userModel");
 const jwtConfig = require("../config/jwt");
 
+
+const generateTokens = (user) => {
+  const accessToken = jwt.sign(
+    { id: user.id, email: user.email },
+    jwtConfig.accessTokenSecret,
+    { expiresIn: jwtConfig.accessTokenExpiresIn }
+  );
+
+  const refreshToken = jwt.sign(
+    { id: user.id, email: user.email },
+    jwtConfig.refreshTokenSecret,
+    { expiresIn: jwtConfig.refreshTokenExpiresIn }
+  );
+
+  return { accessToken, refreshToken };
+};
+
 const userController = {
   async register(req, res) {
     try {
@@ -31,16 +48,32 @@ const userController = {
       const validPassword = await bcrypt.compare(password, user.password);
       if (!validPassword) return res.status(401).json({ error: "Invalid email or password" });
 
-      const token = jwt.sign({ id: user.id, email: user.email }, jwtConfig.secret, {
-        expiresIn: jwtConfig.expiresIn,
-      });
 
-      res.json({ token });
+      const tokens = generateTokens(user);
+      // res.json({ tokens });
+      res.json({ user: { id: user.id, email: user.email, name: user.name }, tokens });
+
     } catch (error) {
       console.error("Login error:", error);
       res.status(500).json({ error: "Login failed" });
     }
   },
+  async refreshToken(req, res) {
+  const { refreshToken } = req.body;
+  if (!refreshToken) return res.status(401).json({ error: "Refresh token required" });
+
+  jwt.verify(refreshToken, jwtConfig.refreshTokenSecret, (err, user) => {
+    if (err) return res.status(403).json({ error: "Invalid refresh token" });
+
+    const newAccessToken = jwt.sign(
+      { id: user.id, email: user.email },
+      jwtConfig.accessTokenSecret,
+      { expiresIn: jwtConfig.accessTokenExpiresIn }
+    );
+
+    res.json({ accessToken: newAccessToken });
+  });
+},
 
   async getUser(req, res) {
     try {

@@ -53,7 +53,36 @@ const postController = {
     } catch (err) {
       res.status(500).json({ error: 'Failed to delete post' });
     }
-  } 
+  } ,
+  async getfollowingsposts(req, res) {
+  
+     try {
+      const userId = req.user.id;
+      console.log(userId,"userid")
+      console.log(userId);
+      const posts = await postModel.getPostsFromFollowing(userId);
+      res.json(posts);
+    } catch (err) {
+      console.error(err);
+      console.log(err,"err")
+      res.status(500).json({ error: 'Failed to fetch following users\' posts' });
+    }
+
+}
+
+ /*  async getFollowingPosts(req, res) {
+    try {
+      const userId = req.user.id;
+      console.log(userId);
+      const posts = await postModel.getPostsFromFollowing(userId);
+      res.json(posts);
+    } catch (err) {
+      console.error(err);
+      console.log(err,"err")
+      res.status(500).json({ error: 'Failed to fetch following users\' posts' });
+    }
+  }, */
 };
 
 module.exports = postController;
+

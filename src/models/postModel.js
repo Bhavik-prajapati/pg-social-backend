@@ -43,7 +43,22 @@ const postModel = {
       `DELETE FROM posts WHERE id = $1 AND user_id = $2`,
       [postId, userId]
     );
+  },
+
+  async getPostsFromFollowing(userId) {
+    const result = await db.query(
+      `
+      SELECT p.*
+      FROM posts p
+      JOIN follow_connections f ON p.user_id = f.following_id
+      WHERE f.follower_id = $1 OR  p.user_id = $1
+      ORDER BY p.created_at DESC
+      `,
+      [userId]
+    );
+    return result.rows;
   }
+
 };
 
 module.exports = postModel;
