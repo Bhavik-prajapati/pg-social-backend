@@ -4,7 +4,7 @@ const postModel = require('../models/postModel');
 const postController = {
   async create(req, res) {
     try {
-      const userId = req.user.id; // extracted via JWT middleware
+      const userId = req.user.id; 
       const { content } = req.body;
       const imageUrl = req.file ? req.file.path : null;
       const post = await postModel.createPost(userId, content, imageUrl);
