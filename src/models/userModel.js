@@ -23,17 +23,28 @@ const UserModel = {
     return rows[0];
   },
 
+ async getUserSearchByEmail(email) {
+  const { rows } = await db.query(
+    "SELECT * FROM users WHERE email LIKE $1",
+    [`%${email}%`] // <-- adds wildcards around the email input
+  );
+  return rows;
+},
+
+  async getByUserId(id) { 
+    const { rows } = await db.query("SELECT * FROM users u where u.id= $1", [id]);
+    return rows;  
+  },  
   async getUserById(id) {
-    const { rows } = await db.query("SELECT * FROM users WHERE id = $1", [id]);
-    return rows[0];
-  },
+    const { rows } = await db.query("SELECT * FROM users u LEFT JOIN posts ps ON u.id=ps.user_id where u.id= $1", [id]);
+    return rows;  
+  },  
 
 
   
   // models/userModel.js
 
   async updateProfilePhoto(id, profile_image, { name, email, bio }) {
-    console.log(profile_image,"base")
   const result = await db.query(
     `UPDATE users 
      SET name = $1, email = $2, bio = $3, profile_image = $4 

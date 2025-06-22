@@ -77,9 +77,17 @@ const userController = {
 
   async getUser(req, res) {
     try {
-      console.log(req.user)
       const { id } = req.user;
-      console.log(id,"id")
+      const user = await UserModel.getByUserId(id);
+      if (!user) return res.status(404).json({ error: "User not found" });
+      res.json(user);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch user" });
+    }
+  },
+  async getUserbyid(req, res) {
+    try {
+      const { id } = req.params;
       const user = await UserModel.getUserById(id);
       if (!user) return res.status(404).json({ error: "User not found" });
       res.json(user);
@@ -87,11 +95,12 @@ const userController = {
       res.status(500).json({ error: "Failed to fetch user" });
     }
   },
+
+  
   async updateProfile(req, res) {
   try {
     const { id } = req.user;
     const {  profile_image  } = req.body;
-    console.log(req.body.profile_image,"image")
     const { name, email, bio } = req.body;
     const updatedUser = await UserModel.updateProfilePhoto(id,profile_image ,{ name, email, bio });
     res.json(updatedUser);
@@ -99,7 +108,27 @@ const userController = {
     console.error("Update profile error:", error);
     res.status(500).json({ error: "Profile update failed" });
   }
+},
+
+async searchbyemail(req, res) {
+  try {
+    const { emailid } = req.query;
+    const user = await UserModel.getUserSearchByEmail(emailid); 
+    if (user) {
+      return res.status(200).send(user);
+
+    } else {
+      return res.status(404).json({ success: false, message: "No user found with that email." });
+    }
+
+  } catch (error) {
+    console.error("Search error:", error);
+    return res.status(500).json({ success: false, message: "Internal server error" });
+  }
 }
+
+
+
 };
 
 module.exports = userController;

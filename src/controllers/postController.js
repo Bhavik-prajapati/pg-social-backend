@@ -5,7 +5,8 @@ const postController = {
   async create(req, res) {
     try {
       const userId = req.user.id; // extracted via JWT middleware
-      const { content, imageUrl } = req.body;
+      const { content } = req.body;
+      const imageUrl = req.file ? req.file.path : null;
       const post = await postModel.createPost(userId, content, imageUrl);
       res.status(201).json(post);
     } catch (err) {
@@ -36,8 +37,10 @@ const postController = {
   },
 
   async getAll(req, res) {
+
     try {
-      const posts = await postModel.getAllPosts();
+      const userId = req.user.id; 
+      const posts = await postModel.getAllPosts(userId);
       res.json(posts);
     } catch (err) {
       res.status(500).json({ error: 'Failed to fetch posts' });
@@ -58,30 +61,14 @@ const postController = {
   
      try {
       const userId = req.user.id;
-      console.log(userId,"userid")
-      console.log(userId);
       const posts = await postModel.getPostsFromFollowing(userId);
       res.json(posts);
     } catch (err) {
       console.error(err);
-      console.log(err,"err")
       res.status(500).json({ error: 'Failed to fetch following users\' posts' });
     }
 
 }
-
- /*  async getFollowingPosts(req, res) {
-    try {
-      const userId = req.user.id;
-      console.log(userId);
-      const posts = await postModel.getPostsFromFollowing(userId);
-      res.json(posts);
-    } catch (err) {
-      console.error(err);
-      console.log(err,"err")
-      res.status(500).json({ error: 'Failed to fetch following users\' posts' });
-    }
-  }, */
 };
 
 module.exports = postController;

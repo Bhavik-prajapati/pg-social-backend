@@ -13,7 +13,6 @@ const followController = {
         });
     }
     
-      console.log(followerId, followingId,"followerId, followingId")
       const result = await followModel.followUser(followerId, followingId);
       res.status(201).json(result);
     } catch (err) {
