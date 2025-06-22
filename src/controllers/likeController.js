@@ -25,16 +25,7 @@ const likeController = {
       res.status(500).json({ message: 'Internal Server Error' });
     }
   },
-  async getLikes(req, res) {
-    try {
-      const { postId } = req.params;
-      const likes = await likeModel.getLikesByPost(postId);
-      res.status(200).json(likes);
-    } catch (err) {
-      console.error('Get Likes Error:', err);
-      res.status(500).json({ message: 'Internal Server Error' });
-    }
-  }
+  
 };
 
 module.exports = likeController;
